@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Egg Hunt 2</string>
+    <string name="put_egg">Put egg</string>
+    <string name="cancel_hunt">Cancel hunt</string>
+    <string name="done_hunting">Done hunting</string>
+</resources>
