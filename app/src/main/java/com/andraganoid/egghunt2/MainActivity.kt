@@ -8,8 +8,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.location.*
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 
@@ -24,19 +24,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val magnetometerReading = FloatArray(3)
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
-
+    lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        sharedViewModel = ViewModelProviders.of(this@MainActivity).get(SharedViewModel::class.java)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
-                Log.d("LOCATIONRESULT", locationResult.lastLocation.latitude.toString())
-                longitude = locationResult.lastLocation.longitude
-                latitude = locationResult.lastLocation.latitude
-                updateOrientationAngles()
+                // Log.d("LOCATIONRESULT", locationResult.lastLocation.latitude.toString())
+                sharedViewModel._currentPosition.value = EggPosition(
+                    locationResult.lastLocation.latitude,
+                    locationResult.lastLocation.longitude,
+                    updateOrientationAngles()
+                )
             }
         }
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -96,7 +99,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 
-    fun updateOrientationAngles() {
+    fun updateOrientationAngles(): Int {
         SensorManager.getRotationMatrix(
             rotationMatrix,
             null,
@@ -104,14 +107,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             magnetometerReading
         )
         SensorManager.getOrientation(rotationMatrix, orientationAngles)
-
-        val  azi = (Math.toDegrees(
+        return (Math.toDegrees(
             orientationAngles.get(0).toDouble()
         ) + 360).toInt() % 360
 
-        Log.d("ANGLES-0",azi.toString())
-     //   Log.d("ANGLES-1",orientationAngles.get(1).toString())
-      //  Log.d("ANGLES-2",orientationAngles.get(2).toString())
+        // Log.d("ANGLES-0", azi.toString())
+        //   Log.d("ANGLES-1",orientationAngles.get(1).toString())
+        //  Log.d("ANGLES-2",orientationAngles.get(2).toString())
     }
 
 }
