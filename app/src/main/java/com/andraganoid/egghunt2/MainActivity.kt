@@ -10,6 +10,8 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.andraganoid.egghunt2.hunt.EggHuntFragment
+import com.andraganoid.egghunt2.model.EggPosition
 import com.google.android.gms.location.*
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 
@@ -17,8 +19,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-    var longitude: Double? = null
-    var latitude: Double? = null
     private lateinit var sensorManager: SensorManager
     private val accelerometerReading = FloatArray(3)
     private val magnetometerReading = FloatArray(3)
@@ -29,12 +29,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+
+
         sharedViewModel = ViewModelProviders.of(this@MainActivity).get(SharedViewModel::class.java)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
-                // Log.d("LOCATIONRESULT", locationResult.lastLocation.latitude.toString())
                 sharedViewModel._currentPosition.value = EggPosition(
                     locationResult.lastLocation.latitude,
                     locationResult.lastLocation.longitude,
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Manifest.permission.ACCESS_COARSE_LOCATION
     ) {
         val mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 100
+        mLocationRequest.interval = 50
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         fusedLocationClient.requestLocationUpdates(mLocationRequest, locationCallback, null)
     }
@@ -110,10 +111,5 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return (Math.toDegrees(
             orientationAngles.get(0).toDouble()
         ) + 360).toInt() % 360
-
-        // Log.d("ANGLES-0", azi.toString())
-        //   Log.d("ANGLES-1",orientationAngles.get(1).toString())
-        //  Log.d("ANGLES-2",orientationAngles.get(2).toString())
     }
-
 }

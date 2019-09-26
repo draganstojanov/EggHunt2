@@ -4,4 +4,7 @@
     <string name="cancel_hunt">Cancel hunt</string>
     <string name="done_hiding">Done hiding</string>
     <string name="eggs_counter">Eggs to find:</string>
+    <string name="play_again">Play again</string>
+    <string name="game_over">GAME OVER!</string>
 </resources>
+
